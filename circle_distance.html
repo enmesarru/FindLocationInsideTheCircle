@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>App</title>
+</head>
+<body>
+    
+    <canvas id="canvas" width="900" tabindex="1" height="600"></canvas>
+    <script src="models.js"></script>
+    <script src="utils.js"></script>
+    <script>       
+        const canvas = document.getElementById("canvas");
+        const context = canvas.getContext("2d");
+
+        canvas.addEventListener("mousemove", mousePool, false)
+        
+        canvas.width = document.body.clientWidth;
+        canvas.height = document.body.clientHeight;
+
+        var points = []
+        var circle = new Circle(new Point(canvas.width/2, canvas.height/2), 100);
+        
+        function setup() {
+            for(let i = 0; i < 50; i++) {
+                let point = new Point(Math.random() * canvas.width, Math.random() * canvas.height)
+                points.push({point, text: `{x: ${Number.parseInt(point.x)}, y: ${Number.parseInt(point.y)}}`});
+            } 
+        }            
+
+        function draw() {
+            points.forEach(element => {
+                drawCircle(element.point.x, element.point.y, 3)
+                drawText(element.text, element.point.x - 5, element.point.y - 5)
+            });
+            circle.draw(context, circle.point.x, circle.point.y, circle.radius)
+        } 
+        
+        function update() {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            draw();
+            circle.drawDistance(points, context); // Draw line between two points
+        }
+
+        // Mouse Event
+        function mousePool(event) {
+            var rect = canvas.getBoundingClientRect();
+            let position = {
+                x: (event.clientX - rect.left) / (rect.right - rect.left) * canvas.width,
+                y: (event.clientY - rect.top) / (rect.bottom - rect.top) * canvas.height
+            };
+
+            circle.point.x = lerp(circle.point.x, position.x, 0.1);
+            circle.point.y = lerp(circle.point.y, position.y, 0.1);
+        }
+
+        setup();
+        setInterval(update, 0);
+    </script>
+    
+</body>
+</html>
